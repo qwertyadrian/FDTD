@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 История изменений:
+    * Рисование анимированных графиков с использованием
+        matplotlib.animation.FuncAnimation
     * Функции и классы, не связанные напрямую с методом FDTD,
         вынесены в модуль tools.
     * Работа с датчиками вынесена в класс Probe.
@@ -47,6 +49,7 @@ if __name__ == '__main__':
     display.activate()
     display.drawSources([sourcePos])
     display.drawProbes(probesPos)
+    Ez_lst = list()
 
     for q in range(1, maxTime):
         # Расчет компоненты поля H
@@ -65,9 +68,10 @@ if __name__ == '__main__':
             probe.addData(Ez, Hy)
 
         if q % 2 == 0:
-            display.updateData(Ez, q)
+            Ez_lst.append(Ez.copy())
 
-    display.stop()
+    ani = display.start_animation(Ez_lst)
+    ani.save("ani.gif")
 
     # Отображение сигнала, сохраненного в датчиках
     tools.showProbeSignals(probes, -1.1, 1.1)

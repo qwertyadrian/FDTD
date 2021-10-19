@@ -4,11 +4,13 @@
 методом FDTD
 """
 
-from typing import List
+from typing import List, Tuple
 
+import matplotlib.lines
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
+from matplotlib.animation import FuncAnimation
 
 
 class Probe:
@@ -71,9 +73,6 @@ class AnimateFieldDisplay:
         """
         self._xList = np.arange(self.maxXSize)
 
-        # Включить интерактивный режим для анимации
-        plt.ion()
-
         # Создание окна для графика
         self._fig, self._ax = plt.subplots()
 
@@ -120,20 +119,25 @@ class AnimateFieldDisplay:
                       [self.minYSize, self.maxYSize],
                       '--k')
 
-    def stop(self):
-        """
-        Остановить анимацию
-        """
-        plt.ioff()
-
-    def updateData(self, data: npt.NDArray, timeCount: int):
+    def updateData(self, data: npt.NDArray) -> Tuple[matplotlib.lines.Line2D]:
         """
         Обновить данные с распределением поля в пространстве
         """
         self._line.set_ydata(data)
-        self._ax.set_title(str(timeCount))
-        self._fig.canvas.draw()
-        self._fig.canvas.flush_events()
+        return self._line,
+
+    def start_animation(self, Ez: List[npt.NDArray]) -> FuncAnimation:
+        """
+        Создание анимации
+        """
+        return FuncAnimation(
+            self._fig,
+            self.updateData,
+            frames=Ez,
+            blit=True,
+            interval=40,
+            repeat=False,
+        )
 
 
 def showProbeSignals(probes: List[Probe], minYSize: float, maxYSize: float):
