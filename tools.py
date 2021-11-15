@@ -11,6 +11,36 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 from matplotlib.animation import FuncAnimation
+from numpy.fft import fft, fftshift
+
+
+class GaussianDiffPlaneWave:
+    """
+    Класс с уравнением плоской волны
+    для дифференцированного гауссова сигнала в дискретном виде
+    d - определяет задержку сигнала.
+    w - определяет ширину сигнала.
+    Sc - число Куранта.
+    eps - относительная диэлектрическая проницаемость среды,
+    в которой расположен источник.
+    mu - относительная магнитная проницаемость среды,
+    в которой расположен источник.
+    """
+
+    def __init__(self, d, w, Sc=1.0, eps=1.0, mu=1.0):
+        self.d = d
+        self.w = w
+        self.Sc = Sc
+        self.eps = eps
+        self.mu = mu
+
+    def getE(self, m, q):
+        """
+        Расчет поля E в дискретной точке пространства m
+        в дискретный момент времени q
+        """
+        tmp = ((q - m * np.sqrt(self.eps * self.mu) / self.Sc) - self.d) / self.w
+        return -2*tmp * np.exp(-(tmp ** 2))
 
 
 class Probe:
@@ -75,6 +105,7 @@ class AnimateFieldDisplay:
 
         # Создание окна для графика
         self._fig, self._ax = plt.subplots()
+        self._fig.set_dpi(100)
 
         # Установка отображаемых интервалов по осям
         self._ax.set_xlim(0, self.maxXSize)
@@ -165,5 +196,22 @@ def showProbeSignals(probes: List[Probe], minYSize: float, maxYSize: float):
     legend = ['Probe x = {}'.format(probe.position) for probe in probes]
     ax.legend(legend)
 
-    # Показать окно с графиками
+    # Сохранить график
+    plt.savefig("results/task3_probeSignals.png")
+    plt.show()
+
+
+def show_signal_spectrum(probe: Probe, dt):
+    spectrum = np.abs(fft(probe.E))
+    spectrum = fftshift(spectrum)
+    df = 1.0 / (probe.E.size * dt)
+    size = probe.E.size
+    freq = np.arange(-size / 2 * df, size / 2 * df, df)
+    plt.plot(freq, spectrum / np.max(spectrum))
+    plt.grid()
+    plt.xlabel('Частота, Гц')
+    plt.ylabel('|S| / |Smax|')
+    plt.xlim(0, 1e9)
+    plt.ylim(0, 1)
+    plt.savefig("results/task3_signalSpectrum.png")
     plt.show()
