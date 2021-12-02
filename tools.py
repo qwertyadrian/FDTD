@@ -14,35 +14,6 @@ from matplotlib.animation import FuncAnimation
 from numpy.fft import fft, fftshift
 
 
-class GaussianDiffPlaneWave:
-    """
-    Класс с уравнением плоской волны
-    для дифференцированного гауссова сигнала в дискретном виде
-    d - определяет задержку сигнала.
-    w - определяет ширину сигнала.
-    Sc - число Куранта.
-    eps - относительная диэлектрическая проницаемость среды,
-    в которой расположен источник.
-    mu - относительная магнитная проницаемость среды,
-    в которой расположен источник.
-    """
-
-    def __init__(self, d, w, Sc=1.0, eps=1.0, mu=1.0):
-        self.d = d
-        self.w = w
-        self.Sc = Sc
-        self.eps = eps
-        self.mu = mu
-
-    def getE(self, m, q):
-        """
-        Расчет поля E в дискретной точке пространства m
-        в дискретный момент времени q
-        """
-        tmp = ((q - m * np.sqrt(self.eps * self.mu) / self.Sc) - self.d) / self.w
-        return -2*tmp * np.exp(-(tmp ** 2))
-
-
 class Probe:
     """
     Класс для хранения временного сигнала в датчике.
@@ -140,15 +111,16 @@ class AnimateFieldDisplay:
         # Отобразить положение источников
         self._ax.plot(sourcesPos, [0] * len(sourcesPos), self._sourceStyle)
 
-    def drawBoundary(self, position: int):
+    def drawBoundaries(self, *positions: int):
         """
-        Нарисовать границу в области моделирования.
+        Нарисовать границы в области моделирования.
 
-        position - координата X границы (в отсчетах).
+        positions - координаты X границы (в отсчетах).
         """
-        self._ax.plot([position, position],
-                      [self.minYSize, self.maxYSize],
-                      '--k')
+        for pos in positions:
+            self._ax.plot([pos, pos],
+                          [self.minYSize, self.maxYSize],
+                          '--k')
 
     def updateData(self, data: npt.NDArray) -> Tuple[matplotlib.lines.Line2D]:
         """

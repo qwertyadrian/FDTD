@@ -5,6 +5,7 @@ import numpy as np
 from scipy.constants import speed_of_light
 
 import tools
+from sources import GaussianDiffPlaneWave
 
 if __name__ == '__main__':
     # Размер области моделирования вдоль оси X
@@ -48,7 +49,7 @@ if __name__ == '__main__':
 
     Ez = np.zeros(maxSize)
     Hy = np.zeros(maxSize)
-    source = tools.GaussianDiffPlaneWave(30.0, 10.0, Sc, eps[sourcePos], mu[sourcePos])
+    source = GaussianDiffPlaneWave(30.0, 10.0, Sc, eps[sourcePos], mu[sourcePos])
 
     # Ez[1] в предыдущий момент времени
     oldEzLeft = Ez[1]
@@ -66,7 +67,7 @@ if __name__ == '__main__':
     display.activate()
     display.drawSources([sourcePos])
     display.drawProbes(probesPos)
-    display.drawBoundary(layer_x)
+    display.drawBoundaries(layer_x)
 
     Ez_lst = list()
 
