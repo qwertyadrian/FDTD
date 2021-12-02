@@ -112,5 +112,5 @@ if __name__ == '__main__':
         probes, -1.1, 1.1, filename="results/task3_probeSignals.png"
     )
     tools.show_signal_spectrum(
-        probes[0], delta_t, filename="results/task3_signalSpectrum.png"
+        probes, delta_t, filename="results/task3_signalSpectrum.png"
     )

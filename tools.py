@@ -144,7 +144,7 @@ class AnimateFieldDisplay:
 
 
 def showProbeSignals(
-        probes: List[Probe], minYSize: float, maxYSize: float,
+        probes: List[Probe], minYSize: float, maxYSize: float, maxXsize=None,
         filename="probe_signals.png"
 ):
     """
@@ -157,7 +157,7 @@ def showProbeSignals(
     fig, ax = plt.subplots()
 
     # Настройка внешнего вида графиков
-    ax.set_xlim(0, len(probes[0].E))
+    ax.set_xlim(0, maxXsize if maxXsize else probes[0].E.size)
     ax.set_ylim(minYSize, maxYSize)
     ax.set_xlabel('q, отсчет')
     ax.set_ylabel('Ez, В/м')
@@ -172,21 +172,45 @@ def showProbeSignals(
     ax.legend(legend)
 
     # Сохранить график
-    plt.savefig(filename)
+    fig.savefig(filename)
     plt.show()
 
 
-def show_signal_spectrum(probe: Probe, dt, filename="signal_spectrum.png"):
-    spectrum = np.abs(fft(probe.E))
-    spectrum = fftshift(spectrum)
-    size = probe.E.size
+def show_signal_spectrum(
+        probes: List[Probe], dt,
+        xmin=0, xmax=1e9, filename="signal_spectrum.png"
+):
+    spectrums = [fftshift(np.abs(fft(probe.E))) for probe in probes]
+    size = probes[0].E.size
     df = 1.0 / (size * dt)
     freq = np.arange(-size / 2 * df, size / 2 * df, df)
-    plt.plot(freq, spectrum / np.max(spectrum))
-    plt.grid()
-    plt.xlabel('Частота, Гц')
-    plt.ylabel('|S| / |Smax|')
-    plt.xlim(0, 1e9)
-    plt.ylim(0, 1)
-    plt.savefig(filename)
+    fig, ax = plt.subplots()
+    for spectrum in spectrums:
+        ax.plot(freq, spectrum / np.max(spectrum))
+    ax.grid()
+    ax.set_xlabel('Частота, Гц')
+    ax.set_ylabel('|S| / |Smax|')
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(0, 1)
+    fig.savefig(filename)
+    plt.show()
+
+
+def show_reflection_coeff(
+        fail_signal: npt.NDArray, reflected_signal: npt.NDArray, dt: float,
+        filename: str = "reflection_coeff.png"
+):
+    fig, ax = plt.subplots()
+    spectrum1 = fftshift(np.abs(fft(fail_signal)))
+    spectrum2 = fftshift(np.abs(fft(reflected_signal)))
+    size = fail_signal.size
+    df = 1.0 / (size * dt)
+    freq = np.arange(-size / 2 * df, size / 2 * df, df)
+    ax.plot(freq, spectrum2 / spectrum1)
+    ax.grid()
+    ax.set_xlabel('Частота, Гц')
+    ax.set_ylabel(r"$|\Gamma|$")
+    ax.set_xlim(0.2e9, 2e9)
+    ax.set_ylim(0, 0.7)
+    fig.savefig(filename)
     plt.show()
