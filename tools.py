@@ -198,6 +198,7 @@ def show_signal_spectrum(
 
 def show_reflection_coeff(
         fail_signal: npt.NDArray, reflected_signal: npt.NDArray, dt: float,
+        xmin=0.2e9, xmax=2e9,
         filename: str = "reflection_coeff.png"
 ):
     fig, ax = plt.subplots()
@@ -210,7 +211,7 @@ def show_reflection_coeff(
     ax.grid()
     ax.set_xlabel('Частота, Гц')
     ax.set_ylabel(r"$|\Gamma|$")
-    ax.set_xlim(0.2e9, 2e9)
+    ax.set_xlim(xmin, xmax)
     ax.set_ylim(0, 0.7)
     fig.savefig(filename)
     plt.show()
