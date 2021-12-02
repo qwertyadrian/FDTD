@@ -143,7 +143,10 @@ class AnimateFieldDisplay:
         )
 
 
-def showProbeSignals(probes: List[Probe], minYSize: float, maxYSize: float):
+def showProbeSignals(
+        probes: List[Probe], minYSize: float, maxYSize: float,
+        filename="probe_signals.png"
+):
     """
     Показать графики сигналов, зарегистрированных в датчиках.
 
@@ -169,15 +172,15 @@ def showProbeSignals(probes: List[Probe], minYSize: float, maxYSize: float):
     ax.legend(legend)
 
     # Сохранить график
-    plt.savefig("results/task3_probeSignals.png")
+    plt.savefig(filename)
     plt.show()
 
 
-def show_signal_spectrum(probe: Probe, dt):
+def show_signal_spectrum(probe: Probe, dt, filename="signal_spectrum.png"):
     spectrum = np.abs(fft(probe.E))
     spectrum = fftshift(spectrum)
-    df = 1.0 / (probe.E.size * dt)
     size = probe.E.size
+    df = 1.0 / (size * dt)
     freq = np.arange(-size / 2 * df, size / 2 * df, df)
     plt.plot(freq, spectrum / np.max(spectrum))
     plt.grid()
@@ -185,5 +188,5 @@ def show_signal_spectrum(probe: Probe, dt):
     plt.ylabel('|S| / |Smax|')
     plt.xlim(0, 1e9)
     plt.ylim(0, 1)
-    plt.savefig("results/task3_signalSpectrum.png")
+    plt.savefig(filename)
     plt.show()

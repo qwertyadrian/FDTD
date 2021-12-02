@@ -108,5 +108,9 @@ if __name__ == '__main__':
     ani.save("results/task3.gif")
 
     # Отображение сигнала, сохраненного в датчиках
-    tools.showProbeSignals(probes, -1.1, 1.1)
-    tools.show_signal_spectrum(probes[0], delta_t)
+    tools.showProbeSignals(
+        probes, -1.1, 1.1, filename="results/task3_probeSignals.png"
+    )
+    tools.show_signal_spectrum(
+        probes[0], delta_t, filename="results/task3_signalSpectrum.png"
+    )
